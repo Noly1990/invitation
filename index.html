@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>严骏陈敏婚礼请柬</title>
+    <!-- <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"> -->
+
+    <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="js/howler.min.js"></script>
+    <script src="js/utilis.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 20px;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            background-image: url('./others/bigBack.JPG');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+
+        .spinner {
+            position: fixed;
+            margin: auto;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            font-size: 20px;
+            width: 10em;
+            height: 10em;
+            border-radius: 50%;
+            box-shadow: inset 0 0 0 1em rgba(58, 168, 237, .2);
+        }
+
+        .spinner i {
+            position: absolute;
+            clip: rect(0, 10em, 10em, 5em);
+            width: 10em;
+            height: 10em;
+            animation: spinner-circle-clipper 1s ease-in-out infinite;
+        }
+
+        @keyframes spinner-circle-clipper {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(180deg);
+            }
+        }
+
+
+        .spinner i:after {
+            position: absolute;
+            clip: rect(0, 10em, 10em, 5em);
+            width: 10em;
+            height: 10em;
+            content: '';
+            animation: spinner-circle 1s ease-in-out infinite;
+            border-radius: 50%;
+            box-shadow: inset 0 0 0 1em #3aa8ed;
+        }
+
+        @keyframes spinner-circle {
+            0% {
+                transform: rotate(-180deg);
+            }
+
+            100% {
+                transform: rotate(180deg);
+            }
+        }
+
+        .spinnerBack {
+            width: 100%;
+            height: 100%;
+            background-image: url('./others/firstBack.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .canvasBack {
+            background-image: url('./others/back.jpeg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: none;
+        }
+
+        .musicTap {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+
+        .musicImg {
+            animation: rotate 3s infinite linear;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: scale(1, 1) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.2, 1.2) rotate(180deg);
+            }
+            100% {
+                transform: scale(1, 1) rotate(360deg);
+            }
+        }
+
+        .musicStop {
+            animation: bigToSmall .6s linear;
+        }
+
+        @keyframes bigToSmall {
+            0% {
+                transform: scale(1, 1);
+            }
+            50% {
+                transform: scale(1.2, 1.2);
+            }
+            100% {
+                transform: scale(1, 1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvasBack" class="canvasBack animated zoomIn">
+        <canvas id="testCanvas">update to canvas</canvas>
+    </div>
+    <div class="musicTap">
+        <img id="mBtn" src="./others/music.png" class="musicImg">
+    </div>
+    <div id="spinnerBack" class="spinnerBack animated rollIn">
+        <div class="spinner">
+            <i></i>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        console.log('begin')
+        var sound = new Howl({
+            src: ['./others/mistletoe.mp3', ]
+        });
+
+        // Clear listener after first call.
+        sound.once('load', function () {
+            sound.play();
+        });
+
+        // Fires when the sound finishes playing.
+        sound.on('end', function () {
+            console.log('Finished!');
+        });
+
+        var mBtn = document.getElementById('mBtn');
+        mBtn.active = true;
+        mBtn.addEventListener('click', function () {
+            if (this.active) {
+                this.active = false;
+                this.className = 'musicStop';
+                sound.pause();
+            } else {
+                this.active = true;
+                this.className = 'musicImg';
+                sound.play();
+            }
+        }, false);
+
+
+
+        init();
+
+        //主程序
+        CanvasRenderingContext2D.prototype.lineText = function (allStr, wNum, lineHeight, x, y) {
+            let strLength = allStr.length;
+            let lines = Math.floor(strLength / wNum) + 1;
+            for (let i = 0; i < lines; i++) {
+                this.fillText(allStr.substr(i * wNum, wNum), x, y + i * lineHeight);
+            }
+        }
+
+        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            this.beginPath();
+            this.moveTo(x + r, y);
+            this.arcTo(x + w, y, x + w, y + h, r);
+            this.arcTo(x + w, y + h, x, y + h, r);
+            this.arcTo(x, y + h, x, y, r);
+            this.arcTo(x, y, x + w, y, r);
+            // this.arcTo(x+r, y);
+            this.closePath();
+            return this;
+        }
+
+        function init() {
+            var testCanvas = document.getElementById('testCanvas');
+            var ctx = testCanvas.getContext('2d');
+            innerWidth = window.innerWidth;
+            innerHeight = window.innerHeight;
+            testCanvas.width = innerWidth;
+            testCanvas.height = innerHeight;
+
+            var srcArr = [
+                './others/cnmap.jpg',
+                './others/back.jpeg',
+                './others/music.png',
+                './others/img1.jpg',
+            ];
+            var imgStore = new ImgStore(srcArr, ctx, mainWork);
+
+
+        }
+
+
+        function mainWork(imgStore) {
+            log('main');
+            var spinnerBack = document.getElementById("spinnerBack");
+            var canvasBack = document.getElementById("canvasBack");
+            spinnerBack.style.display = 'none';
+            canvasBack.style.display = 'block';
+            var ctx = imgStore.ctx;
+
+            ctx.font = "16px 雅黑";
+
+            var str = "这是一段话贾师傅电视机发顺丰更符合公司交付根深蒂固佛挡杀佛比较符合觉得是否觉得时间发货四大行福建师范几哈授课计划付款";
+
+            var myTextContent = new TextBoxContent(ctx, str, 50, 500);
+
+            var myImage = new ImageContent(ctx, imgStore.images['./others/img1.jpg'], 50, 50);
+
+            var drawStore = new DrawStore(ctx);
+
+            myImage.border=true;
+
+
+            drawStore.collections.push(myImage);
+            drawStore.collections.push(myTextContent);
+
+            myTextContent.beginPrint(100);
+            setTimeout(function () {
+                myImage.zoomIn();
+            }, 2000);
+
+            activeLoop(drawStore);
+        }
+
+        var sx = 20;
+        var sy = 20;
+        var sWidth = innerWidth / 2;
+        var sHeight = innerHeight / 2;
+        //requestAnimationFrame动画部分
+
+        function activeLoop(drawStore) {
+
+            //requestAnimationFrame执行loop
+            var ctx = drawStore.ctx;
+
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let index in drawStore.collections) {
+                drawStore.collections[index].drawOut();
+            }
+
+            requestAnimationFrame(activeLoop.bind(this, drawStore));
+        }
+
+        function DrawStore(ctx) {
+            this.ctx = ctx;
+            this.collections = [];
+        }
+
+
+        function TextBoxContent(ctx, allStr, x, y) {
+            this.x = x;
+            this.y = y;
+            this.allStr = allStr;
+            this.length = allStr.length;
+            this.color = 'black';
+            this.ctx = ctx;
+            this.wNum = 17;
+            this.lineHeight = 25;
+            this.index = allStr.length;
+            this.drawOut = function () {
+                var oldStyle = this.ctx.fillStyle;
+
+
+                this.ctx.fillStyle='rgba(255,255,255,0.3)';
+                this.ctx.roundRect(this.x-15,this.y-this.lineHeight,350,(this.length/this.wNum+1)*this.lineHeight,20).fill();
+
+                this.ctx.fillStyle = this.color;          
+                this.ctx.lineText(this.allStr.substr(0, this.index), this.wNum, this.lineHeight, this.x, this.y);
+
+                this.ctx.fillStyle = oldStyle;
+            }
+            this.beginPrint = function (time) {
+                this.index = 0;
+                for (let i = 0; i < this.length; i++) {
+                    window.setTimeout(function () {
+                        this.index++;
+
+                    }.bind(this), time * i);
+                }
+            }
+        }
+
+        function TextContent(ctx, str, x, y) {
+
+            this.x = x;
+            this.y = y;
+            this.ctx = ctx;
+            this.str = str;
+            this.color = 'black';
+            this.drawOut = function () {
+                var oldStyle = this.ctx.fillStyle;
+                this.ctx.fillStyle = this.color;
+                this.ctx.fillText(this.str, x, y);
+                this.ctx.fillStyle = oldStyle;
+            }
+        }
+
+        function ImageContent(ctx, imgObj, x, y) {
+            this.x = x;
+            this.y = y;
+            this.width = 220;
+            this.height = 150;
+            this.ctx = ctx;
+            this.imgObj = imgObj;
+            this.border=false;
+            this.drawOut = function () {
+                var oldStyle = this.ctx.fillStyle;
+                this.ctx.fillStyle='rgba(255,255,255,1)';
+                if (this.border) {
+                    this.ctx.fillRect(this.x-5,this.y-5,this.width+10,this.height+10);
+                }               
+                this.ctx.drawImage(this.imgObj, this.x, this.y, this.width, this.height);
+                this.ctx.fillStyle = oldStyle;
+            }
+
+            this.zoomIn = function () {
+                this.width = 440;
+                this.height = 300;
+                for (let i = 0; i < 200; i++) {
+                    window.setTimeout(function () {
+                        this.width -= 1.4;
+                        this.height -= 1;
+                    }.bind(this), 15 * i);
+                }
+            }
+        }
+
+        //开始的图片加载仓库
+        function ImgStore(srcArr, ctx, callBack) {
+
+            this.images = {};
+            this.length = srcArr.length;
+            this.loadedNum = 0;
+            this.ctx = ctx;
+            this.callBack = callBack;
+            //定义了一个访问器属性，当图片加载完毕以后触发，执行后续
+            Object.defineProperty(this, 'finished', {
+                get: function () {
+                    return this._finished;
+                },
+                set: function (val) {
+                    this._finished = val;
+                    console.log('begin')
+
+                    window.setTimeout(function () {
+                        this.callBack(this);
+                    }.bind(this), 1000);
+
+                },
+                enumerable: true, //对象属性的数据属性，通过for-in遍历到
+                configurable: true, //对象属性的数据属性，能否通过delete删除属性，configurable属性在定义为false以后，就不能再被设置
+            });
+
+            for (var i = 0; i < this.length; i++) {
+                var tempImg = new Image();
+                tempImg.src = srcArr[i];
+                tempImg.onload = function () {
+                    this.loadedNum++;
+                }.bind(this);
+                this.images[srcArr[i]] = tempImg;
+            }
+
+            this.interval = window.setInterval(function () {
+                if (this.loadedNum === this.length) {
+                    this.finished = true;
+                    window.clearInterval(this.interval);
+                }
+            }.bind(this), 500);
+        }
+
+
+
+        //promise 的图片加载函数
+        function loadImg(imgSrc) {
+
+            return new Promise(function (resolve, reject) {
+                var img = new Image();
+                img.src = imgSrc;
+                img.onload = function () {
+                    log(imgSrc + ' loaded!')
+                    resolve(img);
+                }
+            });
+        }
+
+
+        var keyObject = keyboard(39);
+
+        keyObject.press = function () {
+
+        };
+        keyObject.release = function () {
+
+        };
+
+
+        var touch = new TouchDirection();
+        touch.rightEvent = function () {
+
+        }
+        touch.upEvent = function () {
+
+        }
+        touch.leftEvent = function () {
+
+        }
+        touch.downEvent = function () {
+
+        }
+    </script>
+</body>
+
+</html>
